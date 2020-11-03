@@ -1,0 +1,8 @@
+# fichier sujet
+sujet.txt
+
+# Environnement virtuel python
+/venv
+
+# Fichier cache python 
+__pycache__/
