@@ -6,3 +6,6 @@ sujet.txt
 
 # Fichier cache python 
 __pycache__/
+
+# Dossier instance
+/instance
