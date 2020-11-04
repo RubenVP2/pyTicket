@@ -17,13 +17,13 @@ CREATE TABLE ticket (
   date_ticket TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   sujet_ticket TEXT NOT NULL,
   description_ticket TEXT NOT NULL,
-  etat_ticket TEXT NOT NULL
+  etat_ticket TEXT NOT NULL,
   FOREIGN KEY (client_id) REFERENCES user (id)
 );
 
 -- insert values to user
 
-INSERT INTO user (username, password, isAdmin ) 
+INSERT INTO user (username, password, isAdmin )
 VALUES
   ('antoine', 'antoine01', true),
   ('maxence', 'maxence69', true),
@@ -34,7 +34,7 @@ VALUES
 -- insert values to ticket
   INSERT INTO ticket (client_id, date_ticket, sujet_ticket, description_ticket, etat_ticket)
   VALUES
-    (4, 1604488312, 'Imprimante non fonctionnelle', "Depuis que mon collègue a renversé son café sur l'imprimante elle imprime en noir et blanc uniquement", false), 
+    (4, 1604488312, 'Imprimante non fonctionnelle', "Depuis que mon collègue a renversé son café sur l'imprimante elle imprime en noir et blanc uniquement", false),
     (4, 1591269112, "Ordinateur n'a plus de réseau", "L'ordinateur du stagiaire ne peut pas se connecter au réseau interne", true),
-    (5, 1604315512, 'Serveur indisponible', "Serveur indisponible depuis coupure de courant, le site web est indisponible", false), 
+    (5, 1604315512, 'Serveur indisponible', "Serveur indisponible depuis coupure de courant, le site web est indisponible", false),
     (5, 1549278712, "Fibre non performante", "L'ordinateur du stagiaire ne peut pas se connecter au réseau interne", true);
