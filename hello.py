@@ -1,25 +1,11 @@
-from flask import Flask
-from flask import render_template
-from flask import abort, redirect, url_for
+import sqlite3
+
+import click
 from flask import Flask, current_app, g, render_template
 from flask.cli import with_appcontext
 
-import sqlite3
-import click
-
 app = Flask(__name__)
 
-@app.route('/login/')
-def login():
-    return render_template('userConnect.html')
-
-@app.route('/ticketDetail/')
-def ticketDetail():
-    return render_template('ticketDetail.html')
-
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template('error404.html'), 404
 
 @app.route('/')
 def hello_world():
@@ -42,7 +28,7 @@ def get_all_users():
     cur = db.cursor()
     cur.execute("SELECT * FROM user")
     return cur.fetchall()
-
+    
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(
