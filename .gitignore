@@ -9,3 +9,7 @@ __pycache__/
 
 # Dossier instance
 /instance
+
+# Dossier de virtualisation
+/venv
+/ticketVenv
