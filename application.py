@@ -6,12 +6,25 @@ from flask.cli import with_appcontext
 
 import sqlite3
 import click
+from flask.globals import request, session
+from werkzeug.utils import escape
 
 app = Flask(__name__)
 
-@app.route('/login/')
-def login():
-    return render_template('userConnect.html')
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
+
+@app.route('/')
+def index():
+    if 'username' in session:
+        return 'Logged in as %s' %escape(session['username'])
+    return render_template('index.html')
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there and redirect to login form
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
 @app.route('/ticketDetail/')
 def ticketDetail():
@@ -20,11 +33,6 @@ def ticketDetail():
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('error404.html'), 404
-
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -52,6 +60,27 @@ def get_all_users():
     db = get_db()
     cur = db.cursor()
     cur.execute("SELECT * FROM user")
+    return cur.fetchall()
+
+def get_ticket_for_user(username):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"""
+    SELECT id, user.username as 'username', date_ticket, sujet_ticket, description_ticket, etat_ticket 
+    FROM user, ticket
+    WHERE user.id = ticket.client_id 
+    AND ticket.client_id = {username}
+    """)
+    return cur.fetchall()
+
+def get_all_tickets():
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("""
+    SELECT id, user.username as 'username', date_ticket, sujet_ticket, description_ticket, etat_ticket 
+    FROM user, ticket
+    WHERE user.id = ticket.client_id
+    """)
     return cur.fetchall()
 
 def get_db():
