@@ -10,15 +10,21 @@ import click
 app = Flask(__name__)
 
 app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if 'username' in session:
+        return redirect(url_for('ticket'))
     if request.method == 'POST':
         user = login(request.form['username'],request.form['password'])
         if user:
             session['username'] = request.form['username']
             return redirect(url_for('ticket'))
     return render_template('index.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
 @app.route('/ticketDetail/')
 def ticketDetail():
@@ -31,6 +37,7 @@ def page_not_found(error):
 @app.route('/ticket')
 def ticket():
     user = get_user(session['username'])
+    # session['isAdmin'] = user.isAdmin
     return render_template('ticket.html', user=user)
 
 @app.route('/add-ticket')
@@ -59,7 +66,7 @@ def get_all_users():
 def login(username, password):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username FROM user where username='{username}' AND password ='{password}'")
+    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'")
     return cur.fetchall()
 
 def get_user(username):
