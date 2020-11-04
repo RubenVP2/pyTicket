@@ -73,7 +73,7 @@ def close_db(e=None):
 def init_db():
     db = get_db()
 
-    with app.open_resource('script.sql') as f:
+    with app.open_resource('schema.sql') as f:
         # Pour éxécuter du script SQL
         db.executescript(f.read().decode('utf8'))
 
