@@ -35,6 +35,7 @@ def ajout_ticket_page():
 def  admin_page():
     """ return template admin """
     return render_template('admin.html')
+    
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
@@ -73,7 +74,7 @@ def close_db(e=None):
 def init_db():
     db = get_db()
 
-    with app.open_resource('script.sql') as f:
+    with app.open_resource('schema.sql') as f:
         # Pour éxécuter du script SQL
         db.executescript(f.read().decode('utf8'))
 
