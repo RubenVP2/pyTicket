@@ -2,7 +2,7 @@
 sujet.txt
 
 # Environnement virtuel python
-/venv
+/ticketVenv
 
 # Fichier cache python 
 __pycache__/
