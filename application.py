@@ -38,11 +38,6 @@ def ajout_ticket_page():
     """ return template to add a ticket """
     return render_template('add-ticket.html')
 
-@app.route('/admin')
-def  admin_page():
-    """ return template admin """
-    return render_template('admin.html')
-
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
