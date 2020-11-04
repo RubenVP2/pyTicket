@@ -47,6 +47,9 @@
       <div class="form-group">
       <button type="submit" class="btn btn-primary btn-block">Se connecter  </button>
       </div> <!-- form-group// -->
+      {% if error == "true" %}
+        <p class="text-danger text-center">Erreur lors de la connexion</p>
+      {% endif %}
       </form>
     </article>
     </div> <!-- card.// -->

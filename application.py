@@ -19,6 +19,9 @@ def index():
         if user:
             session['username'] = request.form['username']
             return redirect(url_for('ticket'))
+        else:
+            error = 'true'
+            return render_template('index.html', error=error)
     return render_template('index.html')
 
 @app.route('/logout')
