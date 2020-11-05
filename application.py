@@ -12,20 +12,23 @@ from werkzeug.utils import escape
 app = Flask(__name__)
 
 app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if 'username' in session:
+        return redirect(url_for('ticket'))
     if request.method == 'POST':
         user = login(request.form['username'],request.form['password'])
         if user:
             session['username'] = request.form['username']
             return redirect(url_for('ticket'))
+        else:
+            error = 'true'
+            return render_template('index.html', error=error)
     return render_template('index.html')
-
 
 @app.route('/logout')
 def logout():
-    # remove the username from the session if it's there
+    """ Remove session for user currently connect """
     session.pop('username', None)
     return redirect(url_for('index'))
 
@@ -43,7 +46,7 @@ def ticket():
     user = get_user(session['username'])
     if user['isAdmin']:
         return render_template('ticket.html', user=user, tickets=get_all_tickets())
-    return render_template('ticket.html', user=user, tickets=get_ticket_for_user())
+    return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -72,25 +75,20 @@ def get_ticket_for_user(username):
     """ Return tickets for a user specified in param """
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"""
-    SELECT id, user.username as 'username', date_ticket, sujet_ticket, description_ticket, etat_ticket 
-    FROM user, ticket
-    WHERE user.id = ticket.client_id 
-    AND ticket.client_id = {username}
-    """)
+    cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
     return cur.fetchall()
 
 def get_all_tickets():
     """ Return all tickets in database """
     db = get_db()
     cur = db.cursor()
-    cur.execute("SELECT ticket.id, user.username as 'username', datetime(date_ticket, 'unixepoch'), sujet_ticket, description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id")
+    cur.execute("SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id")
     return cur.fetchall()
 
 def login(username, password):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username FROM user where username='{username}' AND password ='{password}'")
+    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'")
     return cur.fetchall()
 
 def get_user(username):
