@@ -22,6 +22,13 @@ def index():
             return redirect(url_for('ticket'))
     return render_template('index.html')
 
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
 @app.route('/ticketDetail/')
 def ticketDetail():
     return render_template('ticketDetail.html')
@@ -74,6 +81,7 @@ def get_ticket_for_user(username):
     return cur.fetchall()
 
 def get_all_tickets():
+    """ Return all tickets in database """
     db = get_db()
     cur = db.cursor()
     cur.execute("SELECT ticket.id, user.username as 'username', datetime(date_ticket, 'unixepoch'), sujet_ticket, description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id")
