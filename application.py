@@ -5,6 +5,7 @@ from flask import Flask, current_app, g, render_template, session, request
 from flask.cli import with_appcontext
 
 import sqlite3
+import json
 import click
 
 app = Flask(__name__)
@@ -40,8 +41,12 @@ def page_not_found(error):
 @app.route('/ticket')
 def ticket():
     user = get_user(session['username'])
-    # session['isAdmin'] = user.isAdmin
-    return render_template('ticket.html', user=user)
+    admin = user[1]
+    if admin:
+        tickets = get_all_tickets()
+    else:
+        tickets = get_user_tickets(session['username'])
+    return render_template('ticket.html', user=user, tickets=tickets)
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -77,6 +82,18 @@ def get_user(username):
     cur = db.cursor()
     cur.execute(f"SELECT username, isAdmin FROM user where username='{username}'")
     return cur.fetchone()
+
+def get_all_tickets():
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT ticket.id, user.username, datetime(date_ticket,'unixepoch'),ticket.sujet_ticket, ticket.etat_ticket FROM ticket INNER JOIN user ON ticket.client_id = user.id")
+    return cur.fetchall()
+
+def get_user_tickets(username):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT ticket.id, user.username, datetime(date_ticket,'unixepoch'),ticket.sujet_ticket, ticket.etat_ticket FROM ticket INNER JOIN user ON ticket.client_id = user.id where user.username ='{username}'")
+    return cur.fetchall()
 
 def get_db():
     if 'db' not in g:
