@@ -32,8 +32,11 @@ def page_not_found(error):
 
 @app.route('/ticket')
 def ticket():
+    """ Return list of tickets to suit of type user """
     user = get_user(session['username'])
-    return render_template('ticket.html', user=user)
+    if user['isAdmin']:
+        return render_template('ticket.html', user=user, tickets=get_all_tickets())
+    return render_template('ticket.html', user=user, tickets=get_ticket_for_user())
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -59,6 +62,7 @@ def get_all_users():
     return cur.fetchall()
 
 def get_ticket_for_user(username):
+    """ Return tickets for a user specified in param """
     db = get_db()
     cur = db.cursor()
     cur.execute(f"""
@@ -72,12 +76,9 @@ def get_ticket_for_user(username):
 def get_all_tickets():
     db = get_db()
     cur = db.cursor()
-    cur.execute("""
-    SELECT id, user.username as 'username', date_ticket, sujet_ticket, description_ticket, etat_ticket 
-    FROM user, ticket
-    WHERE user.id = ticket.client_id
-    """)
+    cur.execute("SELECT ticket.id, user.username as 'username', datetime(date_ticket, 'unixepoch'), sujet_ticket, description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id")
     return cur.fetchall()
+
 def login(username, password):
     db = get_db()
     cur = db.cursor()
@@ -87,7 +88,7 @@ def login(username, password):
 def get_user(username):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}'")
+    cur.execute(f"SELECT * FROM user where username='{username}'")
     return cur.fetchone()
 
 def get_db():
