@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajout d'un ticket</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-</head>
+{% include 'includes/header.html' %}
 <body class="d-flex flex-column h-100">
-    {% include "navbar.html" %}
+{% include 'includes/navbar.html' %}
     <main class="flex-shrink-0" role="main">
         <div class="container mt-5">
           {% if user.isAdmin == 0 %}
@@ -25,10 +18,11 @@
                     <thead class="thead-dark">
                       <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Créateur</th>
+                        <th scope="col">Client</th>
                         <th scope="col">Sujet</th>
                         <th scope="col">Date</th>
-                        <th scope="col">Etat</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -44,12 +38,21 @@
                           <td>Non résolu</td>
                         {% endif %}           
                       </tr>
+                      {% for ticket in tickets %}
+                        <tr>
+                          <th scope="row">{{ ticket[0] }}</th>
+                          <td> {{ ticket[1] }} </td>
+                          <td> {{ ticket[2] }} </td>
+                          <td> {{ ticket[3] }} </td>
+                          <td> {{ ticket[5] }} </td>
+                          <td> <a href="">Modifier</a></td>
+                        </tr>
                       {% endfor %}
                     </tbody>
                   </table>
             </div>
         </div>
     </main>
-
+{% include "includes/script.html"%}
 </body>
 </html>

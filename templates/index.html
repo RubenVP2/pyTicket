@@ -1,21 +1,16 @@
-<!doctype html>
-<html>
-  <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-  </head>
+{% include "includes/header.html" %}
   <body>
-  {% include "navbar.html" %}
+  {% include "includes/navbar.html" %}
   <div class="container ">
     <br><br><br><br>
     <!-- <form method="POST">
       <div class="form-group col-sm-7 mb-3 ">
-            <label for="exampleInputEmail1">Adresse Mail</label>
-            <input type="text" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Nom d'utilisateur" name="username">
+            <label for="username">Votre pseudo</label>
+            <input type="text" class="form-control" name="username" id="username" placeholder="Entrer votre pseudo">
       </div>
       <div class="form-group col-sm-4 mb-2 ">
-          <label for="exampleInputPassword1">Mot de Passe</label>
-          <input type="password" class="form-control" id="password" placeholder="Mot de passe" name="password">
+          <label for="password">Mot de Passe</label>
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
       </div>
         <button type="submit" class="btn btn-primary ml-3">Se connecter</button>
     </form> -->
@@ -58,5 +53,6 @@
     </div> <!-- row.// -->
 
     </div>
+{% include "includes/script.html"%}
   </body>
 </html>

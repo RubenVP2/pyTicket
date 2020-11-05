@@ -7,6 +7,8 @@ from flask.cli import with_appcontext
 import sqlite3
 import json
 import click
+from flask.globals import request, session
+from werkzeug.utils import escape
 
 app = Flask(__name__)
 
@@ -27,6 +29,7 @@ def index():
 
 @app.route('/logout')
 def logout():
+    """ Remove session for user currently connect """
     session.pop('username', None)
     return redirect(url_for('index'))
 
@@ -40,13 +43,11 @@ def page_not_found(error):
 
 @app.route('/ticket')
 def ticket():
+    """ Return list of tickets to suit of type user """
     user = get_user(session['username'])
-    admin = user[1]
-    if admin:
-        tickets = get_all_tickets()
-    else:
-        tickets = get_user_tickets(session['username'])
-    return render_template('ticket.html', user=user, tickets=tickets)
+    if user['isAdmin']:
+        return render_template('ticket.html', user=user, tickets=get_all_tickets())
+    return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -71,6 +72,20 @@ def get_all_users():
     cur.execute("SELECT * FROM user")
     return cur.fetchall()
 
+def get_ticket_for_user(username):
+    """ Return tickets for a user specified in param """
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
+    return cur.fetchall()
+
+def get_all_tickets():
+    """ Return all tickets in database """
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id")
+    return cur.fetchall()
+
 def login(username, password):
     db = get_db()
     cur = db.cursor()
@@ -80,20 +95,8 @@ def login(username, password):
 def get_user(username):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}'")
+    cur.execute(f"SELECT * FROM user where username='{username}'")
     return cur.fetchone()
-
-def get_all_tickets():
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("SELECT ticket.id, user.username, datetime(date_ticket,'unixepoch'),ticket.sujet_ticket, ticket.etat_ticket FROM ticket INNER JOIN user ON ticket.client_id = user.id")
-    return cur.fetchall()
-
-def get_user_tickets(username):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT ticket.id, user.username, datetime(date_ticket,'unixepoch'),ticket.sujet_ticket, ticket.etat_ticket FROM ticket INNER JOIN user ON ticket.client_id = user.id where user.username ='{username}'")
-    return cur.fetchall()
 
 def get_db():
     if 'db' not in g:

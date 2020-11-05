@@ -1,10 +1,6 @@
-<!doctype html>
-<html>
-  <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-  </head>
+{% include 'includes/header.html' %}
   <body>
-    {% include "navbar.html" %}
+  {% include "includes/navbar.html" %}
   <div class="container">
     <div class="mb-5 text-center">
       <h1>Pyckets</h1>
@@ -26,5 +22,6 @@
         <button type="submit" id="statusTicket" class="btn btn-primary col-sm-5 ml-3">Resolu</button>
     </form>
     </div>
+{% include "includes/script.html"%}
   </body>
 </html>
