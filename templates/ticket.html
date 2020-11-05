@@ -31,22 +31,14 @@
                         <th scope="row">{{ ticket.id }}</th>
                         <td>{{ ticket.username }}</td>
                         <td>{{ ticket.sujet_ticket }}</td>
-                        <td>{{ ticket.date_ticket }}</td>
+                        <td>{{ ticket[3] }}</td>
                         {% if ticket.etat_ticket == "1"%}
                           <td>Résolu</td>
                         {% else %}
                           <td>Non résolu</td>
                         {% endif %}           
+                        <td> <a href="">Modifier</a></td>
                       </tr>
-                      {% for ticket in tickets %}
-                        <tr>
-                          <th scope="row">{{ ticket[0] }}</th>
-                          <td> {{ ticket[1] }} </td>
-                          <td> {{ ticket[2] }} </td>
-                          <td> {{ ticket[3] }} </td>
-                          <td> {{ ticket[5] }} </td>
-                          <td> <a href="">Modifier</a></td>
-                        </tr>
                       {% endfor %}
                     </tbody>
                   </table>
