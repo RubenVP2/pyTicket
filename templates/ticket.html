@@ -3,18 +3,18 @@
 {% include 'includes/navbar.html' %}
     <main class="flex-shrink-0" role="main">
         <div class="container mt-5">
-          {% if user.isAdmin == 0 %}
-            <a href="/add-ticket"><button type="button" class="btn btn-primary">Ajouter un ticket</button></a>
-          {% endif %}
 
     <!-- Table to show tickets of current user -->
             <div class="col-12 mt-5">
-              {% if user.isAdmin %}
-                <h3>Tout les tickets d'incident</h3>
-              {% else %}
-                <h3>Mes tickets d'incident</h3>
-              {% endif %}
-                <table class="table mt-3">
+              <div class="row justify-content-between">
+                {% if user.isAdmin %}
+                  <h3> Tout les tickets d'incident</h3>
+                {% else %}
+                  <h3> Mes tickets d'incident</h3>
+                  <a href="/add-ticket"><button type="button" class="btn btn-primary">Ajouter un ticket</button></a>
+                {% endif %}
+              </div>
+                <table class="table mt-3 table-striped">
                     <thead class="thead-dark">
                       <tr>
                         <th scope="col">#</th>
@@ -37,7 +37,7 @@
                         {% else %}
                           <td>Non résolu</td>
                         {% endif %}           
-                        <td> <a href="">Modifier</a></td>
+                        <td><a href=""><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                       </tr>
                       {% endfor %}
                     </tbody>
