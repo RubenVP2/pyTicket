@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import abort, redirect, url_for
-from flask import Flask, current_app, g, render_template
+from flask import Flask, current_app, g, render_template, session, request
 from flask.cli import with_appcontext
 
 import sqlite3
@@ -9,9 +9,16 @@ import click
 
 app = Flask(__name__)
 
-@app.route('/login/')
-def login():
-    return render_template('userConnect.html')
+app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        user = login(request.form['username'],request.form['password'])
+        if user:
+            session['username'] = request.form['username']
+            return redirect(url_for('ticket'))
+    return render_template('index.html')
 
 @app.route('/ticketDetail/')
 def ticketDetail():
@@ -21,20 +28,18 @@ def ticketDetail():
 def page_not_found(error):
     return render_template('error404.html'), 404
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
+@app.route('/ticket')
+def ticket():
+    user = get_user(session['username'])
+    ticket = get_all_ticket()
+    return render_template('ticket.html', user=user, ticket=ticket)
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
+    user = get_user(session['username'])
     """ return template to add a ticket """
-    return render_template('add-ticket.html')
+    return render_template('add-ticket.html', user=user)
 
-@app.route('/admin')
-def  admin_page():
-    """ return template admin """
-    return render_template('admin.html')
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
@@ -52,6 +57,39 @@ def get_all_users():
     cur = db.cursor()
     cur.execute("SELECT * FROM user")
     return cur.fetchall()
+
+def login(username, password):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT username FROM user where username='{username}' AND password ='{password}'")
+    return cur.fetchall()
+
+def get_user(username):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT username, isAdmin,id FROM user where username='{username}'")
+    return cur.fetchall()
+
+def get_ticket(username):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT date_ticket,sujet_ticket,etat_ticket from ticket,user where username='{username}' AND ticket.client_id=user.id")
+    return cur.fetchall()
+
+def get_all_ticket():
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT sujet_ticket,etat_ticket from ticket")
+    return cur.fetchall()
+
+
+def add_ticket(username):
+    db = get_db()
+    cur = db.cursor()
+    user = get_user(session['username'])
+    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('user.id','{subject_ticket}','{description_ticket}')")
+    get_db().commit()
+    return "done"
 
 def get_db():
     if 'db' not in g:

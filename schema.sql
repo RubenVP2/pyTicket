@@ -17,7 +17,7 @@ CREATE TABLE ticket (
   date_ticket TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   sujet_ticket TEXT NOT NULL,
   description_ticket TEXT NOT NULL,
-  etat_ticket TEXT NOT NULL,
+  etat_ticket TEXT NOT NULL DEFAULT 'non resolue',
   FOREIGN KEY (client_id) REFERENCES user (id)
 );
 
