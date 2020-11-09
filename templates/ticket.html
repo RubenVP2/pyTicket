@@ -14,7 +14,7 @@
               {% else %}
                 <h3>Mes tickets d'incident</h3>
               {% endif %}
-                <table class="table mt-3">
+                <table class="table table-hover mt-3">
                     <thead class="thead-dark">
                       <tr>
                         <th scope="col">#</th>
@@ -32,12 +32,8 @@
                         <td>{{ ticket.username }}</td>
                         <td>{{ ticket.sujet_ticket }}</td>
                         <td>{{ ticket[3] }}</td>
-                        {% if ticket.etat_ticket == "1"%}
-                          <td>Résolu</td>
-                        {% else %}
-                          <td>Non résolu</td>
-                        {% endif %}           
-                        <td> <a href="">Modifier</a></td>
+                        <td>{{ ticket.etat_ticket }}</td>           
+                        <td> <a href="ticket/{{ ticket.id }}">Modifier</a></td>
                       </tr>
                       {% endfor %}
                     </tbody>
