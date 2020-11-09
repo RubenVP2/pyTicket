@@ -45,10 +45,10 @@
                       {% for ticket in tickets %}                      
                       <tr>
                         <th scope="row">{{ ticket.id }}</th>
-                        <td>{{ ticket.username }}</td>
+                        <td>{{ ticket.username[0]|upper }}{{ticket.username[1:]}}</td>
                         <td>{{ ticket.sujet_ticket }}</td>
                         <td>{{ ticket[3] }}</td>
-                        <td>{{ ticket.etat_ticket }}</td>           
+                        <td>{{ ticket.etat_ticket[0]|upper }}{{ticket.etat_ticket[1:]}}</td>           
                         <td> <a href="ticket/{{ ticket.id }}"><button type="button" class="btn btn-primary btn-sm">Détails</button</a></td>
                       </tr>
                       {% endfor %}
@@ -72,10 +72,10 @@
                         {% if ticket.etat_ticket == "résolu" %}                    
                           <tr>
                             <th scope="row">{{ ticket.id }}</th>
-                            <td>{{ ticket.username }}</td>
+                            <td>{{ ticket.username[0]|upper }}{{ticket.username[1:]}}</td>
                             <td>{{ ticket.sujet_ticket }}</td>
                             <td>{{ ticket[3] }}</td>                        
-                            <td>{{ ticket.etat_ticket }}</td>           
+                            <td>{{ ticket.etat_ticket[0]|upper }}{{ticket.etat_ticket[1:]}}</td>           
                             <td><a href=""><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                           </tr>
                         {% endif %}
@@ -100,10 +100,10 @@
                         {% if ticket.etat_ticket == "en cours de résolution" %}                    
                           <tr>
                             <th scope="row">{{ ticket.id }}</th>
-                            <td>{{ ticket.username }}</td>
+                            <td>{{ ticket.username[0]|upper }}{{ticket.username[1:]}}</td>
                             <td>{{ ticket.sujet_ticket }}</td>
                             <td>{{ ticket[3] }}</td>         
-                            <td>{{ ticket.etat_ticket }}</td>       
+                            <td>{{ ticket.etat_ticket[0]|upper }}{{ticket.etat_ticket[1:]}}</td>       
                             <td><a href="/ticket/{{ticket.id}}"><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                           </tr>
                         {% endif %}
@@ -128,10 +128,10 @@
                         {% if ticket.etat_ticket == "non résolu" %}                    
                           <tr>
                             <th scope="row">{{ ticket.id }}</th>
-                            <td>{{ ticket.username }}</td>
+                            <td>{{ ticket.username[0]|upper }}{{ticket.username[1:]}}</td>
                             <td>{{ ticket.sujet_ticket }}</td>
                             <td>{{ ticket[3] }}</td>
-                            <td>{{ ticket.etat_ticket }}</td>       
+                            <td>{{ ticket.etat_ticket[0]|upper }}{{ticket.etat_ticket[1:]}}</td>       
                             <td><a href="/ticket/{{ticket.id}}"><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                           </tr>
                         {% endif %}
