@@ -33,10 +33,6 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/ticketDetail/')
-def ticketDetail():
-    return render_template('ticketDetail.html')
-
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('error404.html'), 404
@@ -48,6 +44,26 @@ def ticket():
     if user['isAdmin']:
         return render_template('ticket.html', user=user, tickets=get_all_tickets())
     return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
+
+
+@app.route('/ticket/<idTicket>', methods=["GET", "POST"])
+def ticketDetail(idTicket):
+    """ Test to catch error for idTicket greater than max id on database"""
+    maxIdTicket = max_ticket()
+    if int(idTicket) <= maxIdTicket[0]:
+        """ Call func to update ticket """
+        if request.method == "POST":
+            msg = update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
+            return redirect(url_for('ticket'))
+        """ Return template who show detail of it or update the ticket in database"""
+        return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
+    return redirect(url_for('ticket'))
+
+@app.route('/ticket/<idTicket>/delete')
+def ticketDelete(idTicket):
+    """ Delete ticket on database  and send it to /ticket with message success or error """
+    res = delete_ticket(idTicket)
+    return redirect(url_for('ticket'))
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
@@ -73,6 +89,46 @@ def get_all_users():
     cur.execute("SELECT * FROM user")
     return cur.fetchall()
 
+def make_query(query, needCommit, isAll=None):
+    """ Make query and return in list all rows or just one """
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(query)
+    if needCommit:
+        db.commit()
+        return 'DONE';
+    if isAll:
+        return cur.fetchall()
+    return cur.fetchone()
+
+def add_ticket(username):
+    db = get_db()
+    cur = db.cursor()
+    user = get_user(session['username'])
+    return cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('{user.id}','{subject_ticket}','{description_ticket}')")
+
+def get_ticket(idTicket):
+    """ Return information of ticket """
+    return make_query(f"""
+        SELECT ticket.id, user.username as 'username', sujet_ticket,
+        datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket
+        FROM user inner join ticket on user.id = ticket.client_id
+        WHERE ticket.id = {idTicket}; """, 0, 0)
+
+def update_ticket(idTicket, sujet_ticket, description_ticket, etat_ticket):
+    """ Update information of ticket """
+    return make_query(f"""UPDATE ticket SET sujet_ticket = "{sujet_ticket}",
+        description_ticket = "{description_ticket}",
+        etat_ticket = "{etat_ticket}" WHERE id = {idTicket} """, 1)
+
+def max_ticket():
+    """Return the greatest id of ticket """
+    return make_query("SELECT Max(id) FROM Ticket", 0, 0)
+
+def delete_ticket(idTicket):
+    """ Delete ticket by id """
+    return make_query(f"DELETE from ticket WHERE id = {idTicket}", 1)
+
 def get_ticket_for_user(username):
     """ Return tickets for a user specified in param """
     db = get_db()
@@ -96,8 +152,8 @@ def login(username, password):
 def get_user(username):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin,id FROM user where username='{username}'")
-    return cur.fetchall()
+    cur.execute(f"SELECT * FROM user where username='{username}'")
+    return cur.fetchone()
 
 def get_ticket(username):
     db = get_db()
@@ -111,13 +167,12 @@ def get_all_ticket():
     cur.execute(f"SELECT sujet_ticket,etat_ticket from ticket")
     return cur.fetchall()
 
-
 def add_ticket(username):
     db = get_db()
     cur = db.cursor()
     user = get_user(session['username'])
     cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('user.id','{subject_ticket}','{description_ticket}')")
-    get_db().commit()
+    db.commit()
     return "done"
 
 def get_db():
@@ -139,7 +194,6 @@ def close_db(e=None):
 
 def init_db():
     db = get_db()
-
     with app.open_resource('schema.sql') as f:
         # Pour éxécuter du script SQL
         db.executescript(f.read().decode('utf8'))
