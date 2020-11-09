@@ -22,6 +22,9 @@
                   <a class="nav-link" id="resolved-tab" data-toggle="tab" href="#resolved" role="tab" aria-controls="resolved" aria-selected="false">Résolu</a>
                 </li>
                 <li class="nav-item" role="presentation">
+                  <a class="nav-link" id="progress-tab" data-toggle="tab" href="#progress" role="tab" aria-controls="progress" aria-selected="false">En cours de résolution</a>
+                </li>
+                <li class="nav-item" role="presentation">
                   <a class="nav-link" id="unresolved-tab" data-toggle="tab" href="#unresolved" role="tab" aria-controls="unresolved" aria-selected="false">Non résolu</a>
                 </li>
               </ul>
@@ -66,17 +69,41 @@
                     </thead>
                     <tbody>
                       {% for ticket in tickets %}  
-                        {% if ticket.etat_ticket == "1" %}                    
+                        {% if ticket.etat_ticket == "résolu" %}                    
+                          <tr>
+                            <th scope="row">{{ ticket.id }}</th>
+                            <td>{{ ticket.username }}</td>
+                            <td>{{ ticket.sujet_ticket }}</td>
+                            <td>{{ ticket[3] }}</td>                        
+                            <td>{{ ticket.etat_ticket }}</td>           
+                            <td><a href=""><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
+                          </tr>
+                        {% endif %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="tab-pane fade" id="progress" role="tabpanel" aria-labelledby="progress-tab">
+                  <table class="table mt-3 table-striped">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Sujet</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for ticket in tickets %}  
+                        {% if ticket.etat_ticket == "en cours de résolution" %}                    
                           <tr>
                             <th scope="row">{{ ticket.id }}</th>
                             <td>{{ ticket.username }}</td>
                             <td>{{ ticket.sujet_ticket }}</td>
                             <td>{{ ticket[3] }}</td>
-                            {% if ticket.etat_ticket == "1"%}
-                              <td>Résolu</td>
-                            {% else %}
-                              <td>Non résolu</td>
-                            {% endif %}           
+                            <td>{{ ticket.etat_ticket }}</td>                    
                             <td><a href=""><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                           </tr>
                         {% endif %}
@@ -98,17 +125,13 @@
                     </thead>
                     <tbody>
                       {% for ticket in tickets %}  
-                        {% if ticket.etat_ticket == "0" %}                    
+                        {% if ticket.etat_ticket == "non résolu" %}                    
                           <tr>
                             <th scope="row">{{ ticket.id }}</th>
                             <td>{{ ticket.username }}</td>
                             <td>{{ ticket.sujet_ticket }}</td>
                             <td>{{ ticket[3] }}</td>
-                            {% if ticket.etat_ticket == "1"%}
-                              <td>Résolu</td>
-                            {% else %}
-                              <td>Non résolu</td>
-                            {% endif %}           
+                            <td>{{ ticket.etat_ticket }}</td>                    
                             <td><a href=""><button type="button" class="btn btn-primary btn-sm">Détails</button></a></td>
                           </tr>
                         {% endif %}
