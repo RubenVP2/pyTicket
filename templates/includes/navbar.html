@@ -6,7 +6,7 @@
         <form class="form-inline my-2 my-lg-1">
             <div class="btn-group">
                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ user.username }}
+                    {{ user.username[0]|upper}}{{user.username[1:] }}
                     {% if user.isAdmin %}
                         - Administrateur
                     {% else %}
@@ -14,6 +14,7 @@
                     {% endif %}
                 </button>
                 <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/profile">Mon profil</a>
                     <a class="dropdown-item" href="/logout">Se déconnecter</a>
                 </div>
             </div>

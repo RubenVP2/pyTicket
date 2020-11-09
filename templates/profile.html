@@ -1,0 +1,71 @@
+{% include "includes/header.html" %}
+<style>
+    :root {
+        --avatar-size: 10rem;
+        /* change this value anything, e.g., 100px, 10rem, etc. */
+    }
+
+    .circle {
+        background-color: #bbbbbb;
+        border-radius: 50%;
+        height: var(--avatar-size);
+        text-align: center;
+        width: var(--avatar-size);
+    }
+
+    .initials {
+        font-size: calc(var(--avatar-size) / 2);
+        /* 50% of parent */
+        line-height: 1;
+        position: relative;
+        top: calc(var(--avatar-size) / 4);
+        /* 25% of parent */
+    }
+</style>
+
+<body>
+    {% include "includes/navbar.html" %}
+    <div class="container">
+        <!-- Circle avatar -->
+        <div class="row justify-content-center">
+            <div class="circle mt-4 mb-4">
+                <span class="initials">{{ user.username[0]|upper}}{{user.username[1:2] }}</span>
+            </div>
+        </div>
+        <!-- Form -->
+        <div class="row justify-content-center">
+            <form class="form" method="post">
+                <!-- Username input -->
+                <div class="form-group">
+                    <label for="username">Pseudonyme</label>
+                    <input type="text" class="form-control" name="username" id="username" value="{{ user.username }}">
+                </div>
+                <div class="form-group">
+                    <label for="username">Nouveau mot de passe</label>
+                    <input type="password" class="form-control" name="password" id="password">
+                </div>
+                <div class="form-group">
+                    <label for="username">Confirmer le mot de passe</label>
+                    <input type="password" class="form-control" name="confirm-password" id="confirm-password">
+                    <small></small>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Modifier</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    {% include "includes/script.html"%}
+    <script>
+        $("form").submit(function (event) {
+            if ($("#password").val() != $("#confirm-password").val()) {
+                return;
+            }
+            $("small").text("Mot de passe différent").show().fadeOut(1000);
+            event.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

@@ -71,6 +71,11 @@ def ajout_ticket_page():
     """ return template to add a ticket """
     return render_template('add-ticket.html', user=user)
 
+@app.route('/profile')
+def userProfile():
+    """Show template for user profile"""
+    return render_template('profile.html', user=get_user(session['username']))
+
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
