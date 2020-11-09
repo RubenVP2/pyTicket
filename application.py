@@ -27,15 +27,28 @@ def index():
             return render_template('index.html', error=error)
     return render_template('index.html')
 
+@app.route('/add-ticket',methods=['GET','POST'])
+def ajout_ticket_page():
+    """add ticket for user type=client"""
+    if request.method == 'POST':
+        user = get_userId(session['username'])
+        ajoutTicket = add_ticket(user,request.form['subject_ticket'],request.form['description_ticket'])
+        return redirect(url_for('ticket'))
+    """ return template to add a ticket """
+    return render_template('add-ticket.html')
+
 @app.route('/logout')
 def logout():
     """ Remove session for user currently connect """
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/ticketDetail/')
+@app.route('/ticketDetail/',methods=['GET', 'POST'])
 def ticketDetail():
-    return render_template('ticketDetail.html')
+"""display the detail of the ticket and modify the status"""
+    if request.method == 'POST':
+
+    return render_template('ticketDetail.html', ticketD=get_ticket())
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -49,11 +62,6 @@ def ticket():
         return render_template('ticket.html', user=user, tickets=get_all_tickets())
     return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
 
-@app.route('/add-ticket')
-def ajout_ticket_page():
-    user = get_user(session['username'])
-    """ return template to add a ticket """
-    return render_template('add-ticket.html', user=user)
 
 @app.route('/testgetallusers')
 def testGetAllUsers():
@@ -66,6 +74,13 @@ def user(username=None):
 
 
 # BDD
+def changement(valeurStatus):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("UPDATE ticket set etat_ticket = '{valeurStatus}'")
+    db.commit()
+    return "done"
+
 
 def get_all_users():
     db = get_db()
@@ -79,6 +94,21 @@ def get_ticket_for_user(username):
     cur = db.cursor()
     cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
     return cur.fetchall()
+
+def get_ticket():
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT username,sujet_ticket,description_ticket FROM ticket,user WHERE user.id=ticket.client_id")
+    return cur.fetchone()
+
+def add_ticket(userId ,subject_ticket,description_ticket):
+    """Insert ticket in database"""
+    db = get_db()
+    cur = db.cursor()
+    #user = get_user(session['username'])
+    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('{userId}','{subject_ticket}','{description_ticket}')")
+    db.commit()
+    return "done"
 
 def get_all_tickets():
     """ Return all tickets in database """
@@ -96,29 +126,14 @@ def login(username, password):
 def get_user(username):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin,id FROM user where username='{username}'")
-    return cur.fetchall()
+    cur.execute(f"SELECT * FROM user where username='{username}'")
+    return cur.fetchone()
 
-def get_ticket(username):
+def get_userId(username):
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT date_ticket,sujet_ticket,etat_ticket from ticket,user where username='{username}' AND ticket.client_id=user.id")
-    return cur.fetchall()
-
-def get_all_ticket():
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT sujet_ticket,etat_ticket from ticket")
-    return cur.fetchall()
-
-
-def add_ticket(username):
-    db = get_db()
-    cur = db.cursor()
-    user = get_user(session['username'])
-    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('user.id','{subject_ticket}','{description_ticket}')")
-    get_db().commit()
-    return "done"
+    cur.execute(f"SELECT id FROM user where username='{username}'")
+    return cur.fetchone()
 
 def get_db():
     if 'db' not in g:
