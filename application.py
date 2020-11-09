@@ -40,10 +40,12 @@ def page_not_found(error):
 @app.route('/ticket')
 def ticket():
     """ Return list of tickets to suit of type user """
-    user = get_user(session['username'])
-    if user['isAdmin']:
-        return render_template('ticket.html', user=user, tickets=get_all_tickets())
-    return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
+    if 'username' in session:
+        user = get_user(session['username'])
+        if user['isAdmin']:
+            return render_template('ticket.html', user=user, tickets=get_all_tickets())
+        return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
+    return redirect(url_for('index'))
 
 
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
@@ -68,18 +70,24 @@ def ticketDelete(idTicket):
 @app.route('/add-ticket')
 def ajout_ticket_page():
     """ return template to add a ticket """
-    return render_template('add-ticket.html')
+    if "username" in session :
+        return render_template('add-ticket.html')
+    return redirect(url_for('index'))
 
 @app.route('/profile')
 def userProfile():
     """Show template for user profile"""
-    return render_template('profile.html', user=get_user(session['username']))
+    if "username" in session :
+        return render_template('profile.html', user=get_user(session['username']))
+    return redirect(url_for('index'))
 
+# Retirer avant fin developpement
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
     return render_template('testusers.html', users=users)
 
+# Retirer avant fin developpement
 @app.route('/testuser/<username>')
 def user(username=None):
     return render_template('testuserdetails.html', username=username)
