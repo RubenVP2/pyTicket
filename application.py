@@ -27,16 +27,6 @@ def index():
             return render_template('index.html', error=error)
     return render_template('index.html')
 
-@app.route('/add-ticket',methods=['GET','POST'])
-def ajout_ticket_page():
-    """add ticket for user type=client"""
-    if request.method == 'POST':
-        userId = get_userId(session['username'])
-        ajoutTicket = add_ticket(userId,request.form['subject_ticket'],request.form['description_ticket'])
-        return redirect(url_for('ticket'))
-    """ return template to add a ticket """
-    return render_template('add-ticket.html')
-
 @app.route('/logout')
 def logout():
     """ Remove session for user currently connect """
@@ -55,6 +45,36 @@ def ticket():
         return render_template('ticket.html', user=user, tickets=get_all_tickets())
     return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
 
+@app.route('/add-ticket',methods=['GET','POST'])
+def ajout_ticket_page():
+    """add ticket for user type=client"""
+    if request.method == 'POST':
+        userId = get_userId(session['username'])
+        ajoutTicket = add_ticket(userId,request.form['subject_ticket'],request.form['description_ticket'])
+        return redirect(url_for('ticket'))
+    """ return template to add a ticket """
+    return render_template('add-ticket.html')
+
+
+@app.route('/ticket/<idTicket>', methods=["GET", "POST"])
+def ticketDetail(idTicket):
+    """ Test to catch error for idTicket greater than max id on database"""
+    maxIdTicket = max_ticket()
+    if int(idTicket) <= maxIdTicket[0]:
+        """ Call func to update ticket """
+        if request.method == "POST":
+            msg = update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
+            return redirect(url_for('ticket'))
+        """ Return template who show detail of it or update the ticket in database"""
+        return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
+    return redirect(url_for('ticket'))
+
+@app.route('/ticket/<idTicket>/delete')
+def ticketDelete(idTicket):
+    """ Delete ticket on database  and send it to /ticket with message success or error """
+    res = delete_ticket(idTicket)
+    return redirect(url_for('ticket'))
+
 
 @app.route('/testgetallusers')
 def testGetAllUsers():
@@ -67,13 +87,6 @@ def user(username=None):
 
 
 # BDD
-def changement(valeurStatus):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("UPDATE ticket set etat_ticket = '{valeurStatus}'")
-    db.commit()
-    return "done"
-
 
 def get_all_users():
     db = get_db()
@@ -93,6 +106,7 @@ def make_query(query, needCommit, isAll=None):
         return cur.fetchall()
     return cur.fetchone()
 
+
 def get_ticket(idTicket):
     """ Return information of ticket """
     return make_query(f"""
@@ -106,6 +120,22 @@ def update_ticket(idTicket, sujet_ticket, description_ticket, etat_ticket):
     return make_query(f"""UPDATE ticket SET sujet_ticket = "{sujet_ticket}",
         description_ticket = "{description_ticket}",
         etat_ticket = "{etat_ticket}" WHERE id = {idTicket} """, 1)
+
+def add_ticket(userId ,subject_ticket,description_ticket):
+    """Insert ticket in database"""
+    db = get_db()
+    cur = db.cursor()
+    #user = get_user(session['username'])
+    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ({userId[0]},'{subject_ticket}','{description_ticket}')")
+    db.commit()
+    return "done"
+
+
+def get_userId(username):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT id FROM user where username='{username}'")
+    return cur.fetchone()
 
 def max_ticket():
     """Return the greatest id of ticket """
@@ -121,21 +151,6 @@ def get_ticket_for_user(username):
     cur = db.cursor()
     cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
     return cur.fetchall()
-
-def get_ticket():
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT username,sujet_ticket,description_ticket FROM ticket,user WHERE user.id=ticket.client_id")
-    return cur.fetchone()
-
-def add_ticket(userId ,subject_ticket,description_ticket):
-    """Insert ticket in database"""
-    db = get_db()
-    cur = db.cursor()
-    #user = get_user(session['username'])
-    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ({userId[0]},'{subject_ticket}','{description_ticket}')")
-    db.commit()
-    return "done"
 
 def get_all_tickets():
     """ Return all tickets in database """
@@ -155,13 +170,6 @@ def get_user(username):
     cur = db.cursor()
     cur.execute(f"SELECT * FROM user where username='{username}'")
     return cur.fetchone()
-
-def get_userId(username):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT id FROM user where username='{username}'")
-    return cur.fetchone()
-
 
 def get_db():
     if 'db' not in g:
