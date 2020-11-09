@@ -67,9 +67,8 @@ def ticketDelete(idTicket):
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
-    user = get_user(session['username'])
     """ return template to add a ticket """
-    return render_template('add-ticket.html', user=user)
+    return render_template('add-ticket.html')
 
 @app.route('/profile')
 def userProfile():
@@ -106,11 +105,6 @@ def make_query(query, needCommit, isAll=None):
         return cur.fetchall()
     return cur.fetchone()
 
-def add_ticket(username):
-    db = get_db()
-    cur = db.cursor()
-    user = get_user(session['username'])
-    return cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('{user.id}','{subject_ticket}','{description_ticket}')")
 
 def get_ticket(idTicket):
     """ Return information of ticket """
@@ -159,26 +153,6 @@ def get_user(username):
     cur = db.cursor()
     cur.execute(f"SELECT * FROM user where username='{username}'")
     return cur.fetchone()
-
-def get_ticket(username):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT date_ticket,sujet_ticket,etat_ticket from ticket,user where username='{username}' AND ticket.client_id=user.id")
-    return cur.fetchall()
-
-def get_all_ticket():
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT sujet_ticket,etat_ticket from ticket")
-    return cur.fetchall()
-
-def add_ticket(username):
-    db = get_db()
-    cur = db.cursor()
-    user = get_user(session['username'])
-    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ('user.id','{subject_ticket}','{description_ticket}')")
-    db.commit()
-    return "done"
 
 def get_db():
     if 'db' not in g:
