@@ -3,7 +3,7 @@
 <body>
   {% include 'includes/navbar.html' %}
   <div class="container">
-    <!-- {{ ticket[0 : 6] }}  -->
+    <!-- {{ ticket[0 : 6] }}  -->
     <div class="row">
       <a href="/ticket" class="col-2 mt-5 ml-1">Retour</a>
     </div>
@@ -17,13 +17,13 @@
         </div>
         <div class="form-group row col-10">
           <label for="topicTicket">Sujet</label>
-          <input type="text" class="form-control" name="sujet" id="topicTicket" value="{{ ticket[2] }}" {% if user.isAdmin %}
+          <input type="text" class="form-control" name="sujet" id="topicTicket" value="{{ ticket[2] }}" {% if user.isAdmin %}
             readonly {% endif %} required>
         </div>
         <div class="form-group">
           <label for="descriptionTicket">Description du Ticket</label>
           <textarea class="form-control" name="description" id="descriptionTicket" rows="3" {% if user.isAdmin %} readonly {% endif %}
-            required>{{ ticket[4] }}</textarea>
+            required>{{ ticket[4] }}</textarea>
         </div>
         <!-- Checkbox -->
         <div class="form-check form-check-inline">
@@ -43,7 +43,7 @@
         </div>
         <!-- Buttons -->
 
-        
+
         <div class="form-row">
           <!-- Ask if user want to delete ticket -->
           {% if user.isAdmin == false %}
@@ -59,7 +59,7 @@
         {% endif %}
           <div class="col-auto">
             <button type="submit" id="statusTicket" class="btn btn-primary">Modifier</button>
-          </div>        
+          </div>
         </div>
       </form>
     </div>
