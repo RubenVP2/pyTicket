@@ -60,8 +60,9 @@ def ticketIsAtUser(idTicket):
 def ticketDetail(idTicket):
     """ Test to catch error for idTicket greater than max id on database"""
     user = get_user(session['username'])
-    maxIdTicket = max_ticket()
-    if (int(idTicket) <= maxIdTicket[0] and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and int(idTicket) <= maxIdTicket[0] ):
+    idTicketUrlValid = int(idTicket) <= max_ticket()[0]
+    """ check if user can access to ticket in url and allow admin to access every ticket """
+    if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
         """ Call func to update ticket and redirect to /ticket with msg """
         if request.method == "POST":
             update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
