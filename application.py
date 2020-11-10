@@ -55,7 +55,6 @@ def ajout_ticket_page():
     """ return template to add a ticket """
     return render_template('add-ticket.html')
 
-
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
 def ticketDetail(idTicket):
     """ Test to catch error for idTicket greater than max id on database"""
@@ -75,10 +74,6 @@ def ticketDelete(idTicket):
     res = delete_ticket(idTicket)
     return redirect(url_for('ticket'))
 
-@app.route('/add-ticket')
-def ajout_ticket_page():
-    """ return template to add a ticket """
-    return render_template('add-ticket.html')
 
 @app.route('/profile')
 def userProfile():
@@ -158,14 +153,14 @@ def get_ticket_for_user(username):
     """ Return tickets for a user specified in param """
     db = get_db()
     cur = db.cursor()
-    cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
+    cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
     return cur.fetchall()
 
 def get_all_tickets():
     """ Return all tickets in database """
     db = get_db()
     cur = db.cursor()
-    cur.execute("SELECT ticket.id, user.username as 'username', sujet_ticket, datetime(date_ticket, 'unixepoch'), description_ticket, etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC")
+    cur.execute("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC")
     return cur.fetchall()
 
 def login(username, password):
