@@ -8,11 +8,14 @@ import sqlite3
 import json
 import click
 from flask.globals import request, session
+from flask.helpers import flash
 from werkzeug.utils import escape
 
 app = Flask(__name__)
 
 app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
+
+# Route
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if 'username' in session:
@@ -40,10 +43,13 @@ def page_not_found(error):
 @app.route('/ticket')
 def ticket():
     """ Return list of tickets to suit of type user """
-    user = get_user(session['username'])
-    if user['isAdmin']:
-        return render_template('ticket.html', user=user, tickets=get_all_tickets())
-    return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
+    """ check if the user is logged in """
+    if 'username' in session:
+        user = get_user(session['username'])
+        if user['isAdmin']:
+            return render_template('ticket.html', user=user, tickets=get_all_tickets())
+        return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
+    return redirect(url_for('index'))
 
 @app.route('/add-ticket',methods=['GET','POST'])
 def ajout_ticket_page():
@@ -58,37 +64,80 @@ def ajout_ticket_page():
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
 def ticketDetail(idTicket):
     """ Test to catch error for idTicket greater than max id on database"""
-    maxIdTicket = max_ticket()
-    if int(idTicket) <= maxIdTicket[0]:
-        """ Call func to update ticket """
-        if request.method == "POST":
-            msg = update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
-            return redirect(url_for('ticket'))
-        """ Return template who show detail of it or update the ticket in database"""
-        return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
-    return redirect(url_for('ticket'))
+    """ check if the user is logged in """
+    if 'username' in session:
+        user = get_user(session['username'])
+        idTicketUrlValid = int(idTicket) <= max_ticket()[0]
+        """ check if user can access to ticket in url and allow admin to access every ticket """
+        if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
+            """ Call func to update ticket and redirect to /ticket with msg """
+            if request.method == "POST":
+                update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
+                flash("Les modifications ont bien été prises en compte", 'success')
+                return redirect(url_for('ticket'))
+            """ Return template who show detail of ticket """
+            return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
+        flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
+        return redirect(url_for('ticket'))
+    return redirect(url_for('index'))
 
 @app.route('/ticket/<idTicket>/delete')
 def ticketDelete(idTicket):
-    """ Delete ticket on database  and send it to /ticket with message success or error """
-    res = delete_ticket(idTicket)
-    return redirect(url_for('ticket'))
+    """ Check if the current user is the creator of this ticket and Delete it on database"""
+    if 'username' in session :
+        if ticketIsAtUser(int(idTicket)):
+            delete_ticket(idTicket)
+            flash("Votre ticket à bien été supprimé", 'success')
+            return redirect(url_for('ticket'))
+        """ Return error msg """
+        flash("Impossible de supprimer un ticket qui n'est pas le vôtre", 'info')
+        return redirect(url_for("ticket"))
+    return redirect(url_for("index"))
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def userProfile():
     """Show template for user profile"""
-    return render_template('profile.html', user=get_user(session['username']))
+    if "username" in session :
+        """ Check if method is post then we need to update values on database """
+        if request.method == "POST":
+            username = request.form['username']
+            password = request.form['password']
+            """ if password var is empty then i just make username update """
+            if not password:
+                """ update username and send to /ticket with msg success """
+                update_user(get_user(session['username'])[0], username, onlyUsername=True)
+                session['username'] = username
+                flash('Vôtre pseudonyme à bien été mis à jour', 'success')
+                return redirect(url_for('ticket'))
+            """ update password and send to /ticket with msg success """
+            update_user(get_user(session['username'])[0], username, password=password)
+            session['username'] = username
+            flash("Vos informations ont été mise à jour", 'success')
+            return redirect(url_for('ticket'))
+        return render_template('profile.html', user=get_user(session['username']))
+    return redirect(url_for('index'))
 
+# Retirer avant fin developpement
 @app.route('/testgetallusers')
 def testGetAllUsers():
     users = get_all_users()
     return render_template('testusers.html', users=users)
 
+# Retirer avant fin developpement
 @app.route('/testuser/<username>')
 def user(username=None):
     return render_template('testuserdetails.html', username=username)
 
+# Autres
+
+def ticketIsAtUser(idTicket):
+    """ Test to know if user is the creator of this ticket"""
+    tickets = get_ticket_for_user(get_user(session['username']))
+    for ticket in tickets:
+        if ticket[0] == idTicket:
+            return True
+    return False
 
 # BDD
 
@@ -110,6 +159,11 @@ def make_query(query, needCommit, isAll=None):
         return cur.fetchall()
     return cur.fetchone()
 
+def update_user(idUser, username, password=None, onlyUsername=None):
+    """Update information for user can update only username or password and username"""
+    if onlyUsername:
+        return make_query(f"UPDATE user SET username = '{username}' WHERE id = {idUser}", 1)
+    return make_query(f"UPDATE user SET username = '{username}', password = '{password}' WHERE id = {idUser}", 1)
 
 def get_ticket(idTicket):
     """ Return information of ticket """
