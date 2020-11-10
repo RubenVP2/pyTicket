@@ -95,6 +95,22 @@ def ajout_ticket_page():
 def userProfile():
     """Show template for user profile"""
     if "username" in session :
+        """ Check if method is post then we need to update values on database """
+        if request.method == "POST":
+            username = request.form['username']
+            password = request.form['password']
+            """ if password var is empty then i just make username update """
+            if not password:
+                """ update username and send to /ticket with msg success """
+                update_user(get_user(session['username'])[0], username, onlyUsername=True)
+                session['username'] = username
+                flash('Vôtre pseudonyme à bien été mis à jour', 'success')
+                return redirect(url_for('ticket'))
+            """ update password and send to /ticket with msg success """
+            update_user(get_user(session['username'])[0], username, password=password)
+            session['username'] = username
+            flash("Vos informations ont été mise à jour", 'success')
+            return redirect(url_for('ticket'))
         return render_template('profile.html', user=get_user(session['username']))
     return redirect(url_for('index'))
 
@@ -130,6 +146,11 @@ def make_query(query, needCommit, isAll=None):
         return cur.fetchall()
     return cur.fetchone()
 
+def update_user(idUser, username, password=None, onlyUsername=None):
+    """Update information for user can update only username or password and username"""
+    if onlyUsername:
+        return make_query(f"UPDATE user SET username = '{username}' WHERE id = {idUser}", 1)
+    return make_query(f"UPDATE user SET username = '{username}', password = '{password}' WHERE id = {idUser}", 1)
 
 def get_ticket(idTicket):
     """ Return information of ticket """
