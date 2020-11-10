@@ -8,6 +8,7 @@ import sqlite3
 import json
 import click
 from flask.globals import request, session
+from flask.helpers import flash
 from werkzeug.utils import escape
 
 app = Flask(__name__)
@@ -51,26 +52,34 @@ def ticketDetail(idTicket):
     """ Test to catch error for idTicket greater than max id on database"""
     maxIdTicket = max_ticket()
     if int(idTicket) <= maxIdTicket[0]:
-        """ Call func to update ticket """
+        """ Call func to update ticket and redirect to /ticket with msg """
         if request.method == "POST":
-            msg = update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
+            update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
+            flash("Les modifications ont bien été prises en compte", 'success')
             return redirect(url_for('ticket'))
         """ Return template who show detail of it or update the ticket in database"""
         return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
+    flash("Vous avez tenté d'accéder à un ticket qui n'existe pas", 'info')
     return redirect(url_for('ticket'))
 
 @app.route('/ticket/<idTicket>/delete')
 def ticketDelete(idTicket):
-    """ Delete ticket on database  and send it to /ticket with message success or error """
-    res = delete_ticket(idTicket)
-    return redirect(url_for('ticket'))
+    """ Check if the current user is the creator of this ticket and Delete it on database"""
+    tickets = get_ticket_for_user(get_user(session['username']))
+    if idTicket in tickets:
+        delete_ticket(idTicket)
+        flash("Votre ticket à bien été supprimé", 'success')
+        return redirect(url_for('ticket'))
+    """ Return error msg """
+    flash("Impossible de supprimer un ticket qui n'est pas le vôtre", 'info')
+    return redirect(url_for("ticket"))
 
 @app.route('/add-ticket')
 def ajout_ticket_page():
     """ return template to add a ticket """
     return render_template('add-ticket.html')
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def userProfile():
     """Show template for user profile"""
     return render_template('profile.html', user=get_user(session['username']))

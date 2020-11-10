@@ -58,12 +58,11 @@
     </div>
     {% include "includes/script.html"%}
     <script>
-        $("form").submit(function (event) {
-            if ($("#password").val() != $("#confirm-password").val()) {
-                return;
-            }
-            $("small").text("Mot de passe différent").show().fadeOut(1000);
-            event.preventDefault();
+        // Make test to submit values
+        $('form').on('submit', function() {
+            // Test if both of password are eguals
+            if ( $('#password').val() != $('#confirm-password').val() ) return false;
+
         });
     </script>
 </body>
