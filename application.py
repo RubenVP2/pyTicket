@@ -47,6 +47,7 @@ def ticket():
     """ check if the user is logged in """
     if 'username' in session:
         user = get_user(session['username'])
+        """ check is the user is admin"""
         if user['isAdmin']:
             return render_template('ticket.html', user=user, tickets=get_all_tickets())
         return render_template('ticket.html', user=user, tickets=get_ticket_for_user(user))
@@ -55,8 +56,10 @@ def ticket():
 @app.route('/add-ticket',methods=['GET','POST'])
 def ajout_ticket_page():
     """add ticket for user type=client"""
+    """ check if the user is logged in"""
     if 'username' in session :
         user = get_user(session['username'])
+        """ check if the user isn't admin """
         if user['isAdmin'] == 0:
             if request.method == 'POST':
                 userId = get_userId(session['username'])
@@ -92,10 +95,17 @@ def ticketDetail(idTicket: str):
 @app.route('/ticket/<idTicket>/delete')
 def ticketDelete(idTicket: str):
     """ Check if the current user is the creator of this ticket and Delete it on database"""
+    """ check if the user is logged in """
     if 'username' in session :
+<<<<<<< HEAD
         """ Check if idTicket can parse to int to catch error """
         if isinstance(idTicket, int) and ticketIsAtUser(int(idTicket)):
             delete_ticket(int(idTicket))
+=======
+        """ check if the user is as user """
+        if ticketIsAtUser(int(idTicket)):
+            delete_ticket(idTicket)
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
             flash("Votre ticket à bien été supprimé", 'success')
             return redirect(url_for('ticket'))
         """ Return error msg """
@@ -139,7 +149,11 @@ def ticketIsAtUser(idTicket: int):
 
 # BDD
 
+<<<<<<< HEAD
 def make_query(query: str, needCommit: bool, isAll: bool=None):
+=======
+def make_query(query, needCommit, isAll=None):
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
     """ Make query and return in list all rows or just one """
     db = get_db()
     cur = db.cursor()
@@ -173,19 +187,12 @@ def update_ticket(idTicket: int, sujet_ticket: str, description_ticket: str, eta
 
 def add_ticket(userId ,subject_ticket,description_ticket):
     """Insert ticket in database"""
-    db = get_db()
-    cur = db.cursor()
-    #user = get_user(session['username'])
-    cur.execute(f"INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ({userId[0]},'{subject_ticket}','{description_ticket}')")
-    db.commit()
-    return "done"
+    return make_query(f"""INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ({userId[0]},'{subject_ticket}','{description_ticket}')""", 1)
 
 
 def get_userId(username):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT id FROM user where username='{username}'")
-    return cur.fetchone()
+    """ Get user_ID with his username """
+    return make_query(f"""SELECT id FROM user where username='{username}'""",0,0)
 
 def max_ticket():
     """Return the greatest id of ticket """
@@ -197,18 +204,13 @@ def delete_ticket(idTicket: int):
 
 def get_ticket_for_user(username: tuple):
     """ Return tickets for a user specified in param """
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT ticket.id, user.username as 'username', sujet_ticket, strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ")
-    return cur.fetchall()
+    return make_query (f"SELECT ticket.id, user.username as 'username', sujet_ticket, strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ",0,1)
 
 def get_all_tickets():
     """ Return all tickets in database """
-    db = get_db()
-    cur = db.cursor()
-    cur.execute("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC")
-    return cur.fetchall()
+    return make_query("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC",0,1)
 
+<<<<<<< HEAD
 def login(username: str, password: str):
     db = get_db()
     cur = db.cursor()
@@ -220,8 +222,18 @@ def get_user(username: str):
     cur = db.cursor()
     cur.execute(f"SELECT * FROM user where username='{username}'")
     return cur.fetchone()
+=======
+def login(username, password):
+    """ Return username and isAdmin with params username and password"""
+    return make_query(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'",0,1)
+
+def get_user(username):
+    """ Return all from username with params username"""
+    return make_query(f"SELECT * FROM user where username='{username}'",0,0)
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
 
 def get_db():
+    """ Get DB """
     if 'db' not in g:
         g.db = sqlite3.connect(
             'instance/bdd.db',
@@ -232,12 +244,14 @@ def get_db():
 
 
 def close_db(e=None):
+    """ Close DB """
     db = g.pop('db', None)
 
     if db is not None:
         db.close()
 
 def init_db():
+    """ Initialise DB """
     db = get_db()
     with app.open_resource('schema.sql') as f:
         # Pour éxécuter du script SQL
