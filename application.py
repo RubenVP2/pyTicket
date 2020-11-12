@@ -54,12 +54,17 @@ def ticket():
 @app.route('/add-ticket',methods=['GET','POST'])
 def ajout_ticket_page():
     """add ticket for user type=client"""
-    if request.method == 'POST':
-        userId = get_userId(session['username'])
-        ajoutTicket = add_ticket(userId,request.form['subject_ticket'],request.form['description_ticket'])
-        return redirect(url_for('ticket'))
-    """ return template to add a ticket """
-    return render_template('add-ticket.html')
+    if 'username' in session :
+        user = get_user(session['username'])
+        if user['isAdmin'] == 0:
+            if request.method == 'POST':
+                userId = get_userId(session['username'])
+                ajoutTicket = add_ticket(userId,request.form['subject_ticket'],request.form['description_ticket'])
+                return redirect(url_for('ticket'))
+            """ return template to add a ticket """
+            return render_template('add-ticket.html')
+        return redirect(url_for('index'))
+    return redirect(url_for('index'))                                                                       
 
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
 def ticketDetail(idTicket):
