@@ -159,7 +159,7 @@ def make_query(query: str, needCommit: bool, isAll: bool=None):
     cur.execute(query)
     if needCommit:
         db.commit()
-        return 'DONE';
+        return 'DONE'
     if isAll:
         return cur.fetchall()
     return cur.fetchone()
@@ -231,7 +231,6 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
-
 def close_db(e=None):
     """ Close DB """
     db = g.pop('db', None)
@@ -246,14 +245,12 @@ def init_db():
         # Pour éxécuter du script SQL
         db.executescript(f.read().decode('utf8'))
 
-
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
     """Clear the existing data and create new tables."""
     init_db()
     click.echo('Initialized the database.')
-
 
 app.teardown_appcontext(close_db)
 app.cli.add_command(init_db_command)
