@@ -18,8 +18,9 @@ def index():
     """ Show the login form or log the user """
     if usernameInSession:
         return redirect(url_for('ticket'))
+    # Test is request is POST
     if request.method == 'POST':
-        """ Try to log the user with username and password in the form"""
+        # Try to log the user with username and password in the form
         user = login(request.form['username'],request.form['password'])
         if user:
             session['username'] = request.form['username']
