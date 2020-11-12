@@ -1,58 +1,44 @@
 {% include "includes/header.html" %}
   <body>
   {% include "includes/navbar.html" %}
-  <div class="container ">
-    <br><br><br><br>
-    <!-- <form method="POST">
-      <div class="form-group col-sm-7 mb-3 ">
-            <label for="username">Votre pseudo</label>
-            <input type="text" class="form-control" name="username" id="username" placeholder="Entrer votre pseudo">
-      </div>
-      <div class="form-group col-sm-4 mb-2 ">
-          <label for="password">Mot de Passe</label>
-          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-      </div>
-        <button type="submit" class="btn btn-primary ml-3">Se connecter</button>
-    </form> -->
-    <div class="row justify-content-md-center">
-      <aside class="col-sm-4 center text-center">
-
-    <div class="card">
-    <article class="card-body">
-      <h4 class="card-title text-center mb-4 mt-1"><img src="https://cdn.iconscout.com/icon/free/png-256/python-14-569257.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">Pyckets</h4>
-      <hr>
-      <p class="text-success text-center">Se connecter</p>
-      <form method="POST">
-      <div class="form-group">
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
-        </div>
-        <input name="username" class="form-control" placeholder="Nom d'utilisateur" type="text">
-      </div> <!-- input-group.// -->
-      </div> <!-- form-group// -->
-      <div class="form-group">
-      <div class="input-group">
-        <div class="input-group-prepend">
-            <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-        </div>
-          <input name="password" class="form-control" placeholder="******" type="password">
-      </div> <!-- input-group.// -->
-      </div> <!-- form-group// -->
-      <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-block">Se connecter  </button>
-      </div> <!-- form-group// -->
-      {% if error == "true" %}
-        <p class="text-danger text-center">Erreur lors de la connexion</p>
-      {% endif %}
-      </form>
-    </article>
-    </div> <!-- card.// -->
-
-      </aside> <!-- col.// -->
-    </div> <!-- row.// -->
-
+    <div class="container ">
+      <br><br><br><br>
+      <div class="row justify-content-md-center">
+        <aside class="col-sm-4 center text-center">
+          <div class="card">
+            <article class="card-body">
+              <h4 class="card-title text-center mb-4 mt-1"><img src="https://cdn.iconscout.com/icon/free/png-256/python-14-569257.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">Pyckets</h4>
+              <hr>
+              <p class="text-success text-center">Se connecter</p>
+              <form method="POST">
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                    </div>
+                    <input name="username" class="form-control" placeholder="Nom d'utilisateur" type="text">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                    </div>
+                      <input name="password" class="form-control" placeholder="******" type="password">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block">Se connecter  </button>
+                </div> 
+                {% if error == "true" %}
+                  <p class="text-danger text-center">Erreur lors de la connexion</p>
+                {% endif %}
+              </form>
+            </article>
+          </div> 
+        </aside> 
+      </div> 
     </div>
-{% include "includes/script.html"%}
+  {% include "includes/script.html"%}
   </body>
 </html>
