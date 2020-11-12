@@ -50,22 +50,20 @@ def ticket():
 
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
 def ticketDetail(idTicket: str):
-    """ check if the user is logged in """
-    if 'username' in session:
+    """ check if the user is logged in and check if idTicket can parse to int to catch error """
+    if 'username' in session and isinstance(idTicket, int):
         user = get_user(session['username'])
-        """ Check if idTicket can parse to int to catch error """
-        if isinstance(idTicket, int):
-            """ Test to catch error for idTicket greater than max id on database"""
-            idTicketUrlValid = int(idTicket) <= max_ticket()[0]
-            """ check if user can access to ticket in url and allow admin to access every ticket """
-            if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
-                """ Call func to update ticket and redirect to /ticket with msg """
-                if request.method == "POST":
-                    update_ticket(int(idTicket), request.form['sujet'], request.form['description'], request.form['radioEtat'])
-                    flash("Les modifications ont bien été prises en compte", 'success')
-                    return redirect(url_for('ticket'))
-                """ Return template who show detail of ticket """
-                return render_template('ticketDetail.html', ticket = get_ticket(int(idTicket)), user=get_user(session['username']))
+        """ Test to catch error for idTicket greater than max id on database"""
+        idTicketUrlValid = int(idTicket) <= max_ticket()[0]
+        """ check if user can access to ticket in url and allow admin to access every ticket """
+        if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
+            """ Call func to update ticket and redirect to /ticket with msg """
+            if request.method == "POST":
+                update_ticket(int(idTicket), request.form['sujet'], request.form['description'], request.form['radioEtat'])
+                flash("Les modifications ont bien été prises en compte", 'success')
+                return redirect(url_for('ticket'))
+            """ Return template who show detail of ticket """
+            return render_template('ticketDetail.html', ticket = get_ticket(int(idTicket)), user=get_user(session['username']))
         flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
         return redirect(url_for('ticket'))
     return redirect(url_for('index'))
@@ -75,11 +73,10 @@ def ticketDelete(idTicket: str):
     """ Check if the current user is the creator of this ticket and Delete it on database"""
     if 'username' in session :
         """ Check if idTicket can parse to int to catch error """
-        if isinstance(idTicket, int):
-            if ticketIsAtUser(int(idTicket)):
-                delete_ticket(int(idTicket))
-                flash("Votre ticket à bien été supprimé", 'success')
-                return redirect(url_for('ticket'))
+        if isinstance(idTicket, int) and ticketIsAtUser(int(idTicket)):
+            delete_ticket(int(idTicket))
+            flash("Votre ticket à bien été supprimé", 'success')
+            return redirect(url_for('ticket'))
         """ Return error msg """
         flash("Impossible de supprimer un ticket qui n'est pas le vôtre", 'info')
         return redirect(url_for("ticket"))
