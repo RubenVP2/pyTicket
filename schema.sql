@@ -47,4 +47,4 @@ INSERT INTO ticket (client_id, date_ticket, sujet_ticket, description_ticket, et
    (7, '2020-10-10 11:53:07', "Pc portable qui ne fonctionne pas", "mon Pc portable ne s'allume plus ...", 'résolu'),
    (7, '2020-11-10 08:12:07', "mot de passe oublié", "j'ai oublié mon mot de passe pour me connecter au site de l'entreprise!", 'non résolu'),
    (5, '2020-07-10 14:09:07', "Perdu mon telephone", "J'ai oublié mon telephone dans le vogue merry serait-il possible dans avoir un nouveau?", 'non résolu'),
-   (8, '2020-03-10 09:59:07', "virus sur l'ordinateur", "je vais avoir besoin d'une INTERVENTION car j'ai pris un virus en utilisant RUST", 'non résolu'),
+   (8, '2020-03-10 09:59:07', "virus sur l'ordinateur", "je vais avoir besoin d'une INTERVENTION car j'ai pris un virus en utilisant RUST", 'non résolu');
