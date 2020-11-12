@@ -69,22 +69,24 @@ def ajout_ticket_page():
 
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
 def ticketDetail(idTicket: str):
-    """ check if the user is logged in and check if idTicket can parse to int to catch error """
-    if 'username' in session and isinstance(idTicket, int):
-        user = get_user(session['username'])
-        """ Test to catch error for idTicket greater than max id on database"""
-        idTicketUrlValid = int(idTicket) <= max_ticket()[0]
-        """ check if user can access to ticket in url and allow admin to access every ticket """
-        if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
-            """ Call func to update ticket and redirect to /ticket with msg """
-            if request.method == "POST":
-                update_ticket(int(idTicket), request.form['sujet'], request.form['description'], request.form['radioEtat'])
-                flash("Les modifications ont bien été prises en compte", 'success')
-                return redirect(url_for('ticket'))
-            """ Return template who show detail of ticket """
-            return render_template('ticketDetail.html', ticket = get_ticket(int(idTicket)), user=get_user(session['username']))
-        flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
-        return redirect(url_for('ticket'))
+    """ check if the user is logged in """
+    if 'username' in session:
+        """ check if idTicket can parse to int to catch error """
+        if isinstance(idTicket, int):
+            user = get_user(session['username'])
+            """ Test to catch error for idTicket greater than max id on database"""
+            idTicketUrlValid = int(idTicket) <= max_ticket()[0]
+            """ check if user can access to ticket in url and allow admin to access every ticket """
+            if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
+                """ Call func to update ticket and redirect to /ticket with msg """
+                if request.method == "POST":
+                    update_ticket(int(idTicket), request.form['sujet'], request.form['description'], request.form['radioEtat'])
+                    flash("Les modifications ont bien été prises en compte", 'success')
+                    return redirect(url_for('ticket'))
+                """ Return template who show detail of ticket """
+                return render_template('ticketDetail.html', ticket = get_ticket(int(idTicket)), user=get_user(session['username']))
+            flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
+            return redirect(url_for('ticket'))
     return redirect(url_for('index'))
 
 @app.route('/ticket/<idTicket>/delete')
