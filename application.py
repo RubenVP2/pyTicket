@@ -1,15 +1,12 @@
 from flask import Flask
 from flask import render_template
-from flask import abort, redirect, url_for
-from flask import Flask, current_app, g, render_template, session, request
+from flask import redirect, url_for
+from flask import Flask, g, render_template, session, request
 from flask.cli import with_appcontext
-
 import sqlite3
-import json
 import click
 from flask.globals import request, session
 from flask.helpers import flash
-from werkzeug.utils import escape
 
 app = Flask(__name__)
 
@@ -74,33 +71,41 @@ def ajout_ticket_page():
     return redirect(url_for('index'))                                                                       
 
 @app.route('/ticket/<idTicket>', methods=["GET", "POST"])
-def ticketDetail(idTicket):
-    """ Test to catch error for idTicket greater than max id on database"""
+def ticketDetail(idTicket: str):
     """ check if the user is logged in """
     if 'username' in session:
-        user = get_user(session['username'])
-        idTicketUrlValid = int(idTicket) <= max_ticket()[0]
-        """ check if user can access to ticket in url and allow admin to access every ticket """
-        if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
-            """ Call func to update ticket and redirect to /ticket with msg """
-            if request.method == "POST":
-                update_ticket(idTicket, request.form['sujet'], request.form['description'], request.form['radioEtat'])
-                flash("Les modifications ont bien été prises en compte", 'success')
-                return redirect(url_for('ticket'))
-            """ Return template who show detail of ticket """
-            return render_template('ticketDetail.html', ticket = get_ticket(idTicket), user=get_user(session['username']))
-        flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
-        return redirect(url_for('ticket'))
+        """ check if idTicket can parse to int to catch error """
+        if isinstance(idTicket, int):
+            user = get_user(session['username'])
+            """ Test to catch error for idTicket greater than max id on database"""
+            idTicketUrlValid = int(idTicket) <= max_ticket()[0]
+            """ check if user can access to ticket in url and allow admin to access every ticket """
+            if (idTicketUrlValid and ticketIsAtUser(int(idTicket))) or (user['isAdmin'] and idTicketUrlValid):
+                """ Call func to update ticket and redirect to /ticket with msg """
+                if request.method == "POST":
+                    update_ticket(int(idTicket), request.form['sujet'], request.form['description'], request.form['radioEtat'])
+                    flash("Les modifications ont bien été prises en compte", 'success')
+                    return redirect(url_for('ticket'))
+                """ Return template who show detail of ticket """
+                return render_template('ticketDetail.html', ticket = get_ticket(int(idTicket)), user=get_user(session['username']))
+            flash("Vous avez tenté d'accéder à un ticket qui n'existe pas ou qui n'est pas le vôtre", 'info')
+            return redirect(url_for('ticket'))
     return redirect(url_for('index'))
 
 @app.route('/ticket/<idTicket>/delete')
-def ticketDelete(idTicket):
+def ticketDelete(idTicket: str):
     """ Check if the current user is the creator of this ticket and Delete it on database"""
     """ check if the user is logged in """
     if 'username' in session :
+<<<<<<< HEAD
+        """ Check if idTicket can parse to int to catch error """
+        if isinstance(idTicket, int) and ticketIsAtUser(int(idTicket)):
+            delete_ticket(int(idTicket))
+=======
         """ check if the user is as user """
         if ticketIsAtUser(int(idTicket)):
             delete_ticket(idTicket)
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
             flash("Votre ticket à bien été supprimé", 'success')
             return redirect(url_for('ticket'))
         """ Return error msg """
@@ -111,20 +116,20 @@ def ticketDelete(idTicket):
 
 @app.route('/profile', methods=['GET', 'POST'])
 def userProfile():
-    """Show template for user profile"""
+    """ Show template for user profile """
     if "username" in session :
-        """ Check if method is post then we need to update values on database """
+        """ Check if method is post, then we need to update values on database """
         if request.method == "POST":
             username = request.form['username']
             password = request.form['password']
             """ if password var is empty then i just make username update """
             if not password:
-                """ update username and send to /ticket with msg success """
+                """ update username in bdd and session and send to /ticket with msg success """
                 update_user(get_user(session['username'])[0], username, onlyUsername=True)
                 session['username'] = username
                 flash('Vôtre pseudonyme à bien été mis à jour', 'success')
                 return redirect(url_for('ticket'))
-            """ update password and send to /ticket with msg success """
+            """ update password, username, session and send to /ticket with msg success """
             update_user(get_user(session['username'])[0], username, password=password)
             session['username'] = username
             flash("Vos informations ont été mise à jour", 'success')
@@ -134,7 +139,7 @@ def userProfile():
 
 # Autres
 
-def ticketIsAtUser(idTicket):
+def ticketIsAtUser(idTicket: int):
     """ Test to know if user is the creator of this ticket"""
     tickets = get_ticket_for_user(get_user(session['username']))
     for ticket in tickets:
@@ -144,7 +149,11 @@ def ticketIsAtUser(idTicket):
 
 # BDD
 
+<<<<<<< HEAD
+def make_query(query: str, needCommit: bool, isAll: bool=None):
+=======
 def make_query(query, needCommit, isAll=None):
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
     """ Make query and return in list all rows or just one """
     db = get_db()
     cur = db.cursor()
@@ -156,13 +165,13 @@ def make_query(query, needCommit, isAll=None):
         return cur.fetchall()
     return cur.fetchone()
 
-def update_user(idUser, username, password=None, onlyUsername=None):
+def update_user(idUser: int, username: str, password: str=None, onlyUsername: bool=None):
     """Update information for user can update only username or password and username"""
     if onlyUsername:
         return make_query(f"UPDATE user SET username = '{username}' WHERE id = {idUser}", 1)
     return make_query(f"UPDATE user SET username = '{username}', password = '{password}' WHERE id = {idUser}", 1)
 
-def get_ticket(idTicket):
+def get_ticket(idTicket: int):
     """ Return information of ticket """
     return make_query(f"""
         SELECT ticket.id, user.username as 'username', sujet_ticket,
@@ -170,7 +179,7 @@ def get_ticket(idTicket):
         FROM user inner join ticket on user.id = ticket.client_id
         WHERE ticket.id = {idTicket}; """, 0, 0)
 
-def update_ticket(idTicket, sujet_ticket, description_ticket, etat_ticket):
+def update_ticket(idTicket: int, sujet_ticket: str, description_ticket: str, etat_ticket: str):
     """ Update information of ticket """
     return make_query(f"""UPDATE ticket SET sujet_ticket = "{sujet_ticket}",
         description_ticket = "{description_ticket}",
@@ -189,11 +198,11 @@ def max_ticket():
     """Return the greatest id of ticket """
     return make_query("SELECT Max(id) FROM Ticket", 0, 0)
 
-def delete_ticket(idTicket):
+def delete_ticket(idTicket: int):
     """ Delete ticket by id """
     return make_query(f"DELETE from ticket WHERE id = {idTicket}", 1)
 
-def get_ticket_for_user(username):
+def get_ticket_for_user(username: tuple):
     """ Return tickets for a user specified in param """
     return make_query (f"SELECT ticket.id, user.username as 'username', sujet_ticket, strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id WHERE user.id LIKE '{username[0]}' ",0,1)
 
@@ -201,6 +210,19 @@ def get_all_tickets():
     """ Return all tickets in database """
     return make_query("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC",0,1)
 
+<<<<<<< HEAD
+def login(username: str, password: str):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'")
+    return cur.fetchall()
+
+def get_user(username: str):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute(f"SELECT * FROM user where username='{username}'")
+    return cur.fetchone()
+=======
 def login(username, password):
     """ Return username and isAdmin with params username and password"""
     return make_query(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'",0,1)
@@ -208,6 +230,7 @@ def login(username, password):
 def get_user(username):
     """ Return all from username with params username"""
     return make_query(f"SELECT * FROM user where username='{username}'",0,0)
+>>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
 
 def get_db():
     """ Get DB """
@@ -217,7 +240,6 @@ def get_db():
             detect_types=sqlite3.PARSE_DECLTYPES
         )
         g.db.row_factory = sqlite3.Row
-
     return g.db
 
 def close_db(e=None):
