@@ -107,7 +107,6 @@ def ticketDelete(idTicket: str):
         return redirect(url_for("ticket"))
     return redirect(url_for("index"))
 
-
 @app.route('/profile', methods=['GET', 'POST'])
 def userProfile():
     """ Show template for user profile """
@@ -187,7 +186,6 @@ def update_ticket(idTicket: int, sujet_ticket: str, description_ticket: str, eta
 def add_ticket(userId ,subject_ticket,description_ticket):
     """Insert ticket in database"""
     return make_query(f"""INSERT INTO ticket (client_id,sujet_ticket,description_ticket) VALUES ({userId[0]},'{subject_ticket}','{description_ticket}')""", 1)
-
 
 def get_userId(username):
     """ Get user_ID with his username """
