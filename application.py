@@ -210,16 +210,12 @@ def get_all_tickets():
     return make_query("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC",0,1)
 
 def login(username: str, password: str):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'")
-    return cur.fetchall()
+    """ Return username and isAdmin with params username and password"""
+    return make_query(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'",0,1)
 
 def get_user(username: str):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT * FROM user where username='{username}'")
-    return cur.fetchone()
+    """ Return all from username with params username"""
+    return make_query(f"SELECT * FROM user where username='{username}'",0,0)
 
 def get_db():
     """ Get DB """
