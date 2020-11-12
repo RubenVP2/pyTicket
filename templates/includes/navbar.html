@@ -1,11 +1,14 @@
 <!-- Navbar -->
 <nav class="navbar navbar-dark bg-dark">
-    <a class="navbar-brand" href="/ticket"><img src="https://cdn.iconscout.com/icon/free/png-256/python-14-569257.png" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
-    Pyckets</a>
+    <a class="navbar-brand" href="/ticket">
+        <img src="https://cdn.iconscout.com/icon/free/png-256/python-14-569257.png" width="30" height="30" class="d-inline-block align-top" alt="Logo Python" loading="lazy">
+        Pyckets
+    </a>
     {% if user %}
         <form class="form-inline my-2 my-lg-1">
             <div class="btn-group">
                 <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <!-- Affiche le nom d'utilisateur avec un majuscule au début et si il est admin ou client -->
                     {{ user.username[0]|upper}}{{user.username[1:] }}
                     {% if user.isAdmin %}
                         - Administrateur

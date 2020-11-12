@@ -1,5 +1,4 @@
 {% include 'includes/header.html' %}
-
 <body>
   {% include 'includes/navbar.html' %}
   <div class="container">
@@ -42,8 +41,6 @@
           <label class="form-check-label" for="radioResolute">Résolu</label>
         </div>
         <!-- Buttons -->
-
-
         <div class="form-row">
           <!-- Ask if user want to delete ticket -->
           {% if user.isAdmin == false %}
@@ -63,7 +60,6 @@
         </div>
       </form>
     </div>
-
   </div>
   {% include "includes/script.html"%}
   <script>
@@ -78,5 +74,4 @@
     });
   </script>
 </body>
-
 </html>
