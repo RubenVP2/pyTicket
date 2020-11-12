@@ -1,10 +1,8 @@
-from flask import Flask
-from flask import render_template
-from flask import redirect, url_for
-from flask import Flask, g, render_template, session, request
-from flask.cli import with_appcontext
 import sqlite3
 import click
+from flask import (Flask, g, redirect, render_template, request, session,
+                   url_for)
+from flask.cli import with_appcontext
 from flask.globals import request, session
 from flask.helpers import flash
 
