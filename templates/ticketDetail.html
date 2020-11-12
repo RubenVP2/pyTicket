@@ -1,0 +1,77 @@
+{% include 'includes/header.html' %}
+<body>
+  {% include 'includes/navbar.html' %}
+  <div class="container">
+    <!-- {{ ticket[0 : 6] }}  -->
+    <div class="row">
+      <a href="/ticket" class="col-2 mt-5 ml-1">Retour</a>
+    </div>
+    <div class="row mt-5">
+      <!-- This form by post can update values of ticket -->
+      <form class="col-12" method="POST">
+        <!-- Inputs -->
+        <div class="form-group row col-sm-5">
+          <label for="clientTicket">Nom du client</label>
+          <input type="text" class="form-control" id="clientTicket" value="{{ ticket[1] }}" readonly>
+        </div>
+        <div class="form-group row col-10">
+          <label for="topicTicket">Sujet</label>
+          <input type="text" class="form-control" name="sujet" id="topicTicket" value="{{ ticket[2] }}" {% if user.isAdmin %}
+            readonly {% endif %} required>
+        </div>
+        <div class="form-group">
+          <label for="descriptionTicket">Description du Ticket</label>
+          <textarea class="form-control" name="description" id="descriptionTicket" rows="3" {% if user.isAdmin %} readonly {% endif %}
+            required>{{ ticket[4] }}</textarea>
+        </div>
+        <!-- Checkbox -->
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="radioEtat" id="radioNoneResolute" value="non résolu"
+            {% if ticket[5] == 'non résolu' %} checked {% endif %} required>
+          <label class="form-check-label" for="radioNoneResolute">Non résolu</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="radioEtat" id="radioCurrent" value="en cours de résolution"
+            {% if ticket[5] == 'en cours de résolution' %} checked {% endif %}>
+          <label class="form-check-label" for="radioCurrent">En cours de résolution</label>
+        </div>
+        <div class="form-check form-check-inline mb-5">
+          <input class="form-check-input" type="radio" name="radioEtat" id="radioResolute" value="résolu"
+            {% if ticket[5] == 'résolu' %} checked {% endif %}>
+          <label class="form-check-label" for="radioResolute">Résolu</label>
+        </div>
+        <!-- Buttons -->
+        <div class="form-row">
+          <!-- Ask if user want to delete ticket -->
+          {% if user.isAdmin == false %}
+          <div class="col-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <button type="button" class="input-group-text"><img height="25" width="25" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/whatsapp/268/locked_1f512.png" /></button>
+              </div>
+              <!-- to delete ticket-->
+              <button id="statusTicket" class="btn btn-danger mr-3" disabled><a style="color: white;text-decoration: none;" href="/ticket/{{ ticket[0] }}/delete">Suppresion</a></button>
+            </div>
+          </div>
+        {% endif %}
+          <div class="col-auto">
+            <button type="submit" id="statusTicket" class="btn btn-primary">Modifier</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% include "includes/script.html"%}
+  <script>
+    // This script toggle disabled attr of button delete and toggle src of img lock
+    $('.input-group-text').click(function() {
+      if ( $('.input-group-text img').attr('src') == "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/whatsapp/268/locked_1f512.png") {
+        $('.input-group-text img').prop('src', 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/whatsapp/268/unlocked_1f513.png')
+      } else {
+        $('.input-group-text img').prop('src', 'https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/whatsapp/268/locked_1f512.png')
+      }
+      $('#statusTicket').prop('disabled', function(i, v) { return !v; });
+    });
+  </script>
+</body>
+</html>
