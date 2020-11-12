@@ -25,8 +25,8 @@ def index():
             session['username'] = request.form['username']
             return redirect(url_for('ticket'))
         else:
-            error = 'true'
-            return render_template('index.html', error=error)
+            flash("Erreur lors de la connexion", 'error')
+            return render_template('index.html')
     return render_template('index.html')
 
 @app.route('/logout')
