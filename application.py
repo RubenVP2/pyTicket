@@ -18,9 +18,12 @@ app.secret_key = b'\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa'
 # Route
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """ Show the login form or log the user """
+    """ Check if the user is logged in"""
     if 'username' in session:
         return redirect(url_for('ticket'))
     if request.method == 'POST':
+        """ Try to log the user with username and password in the form"""
         user = login(request.form['username'],request.form['password'])
         if user:
             session['username'] = request.form['username']
@@ -38,6 +41,7 @@ def logout():
 
 @app.errorhandler(404)
 def page_not_found(error):
+    """ Show 404 not found """
     return render_template('error404.html'), 404
 
 @app.route('/ticket')
@@ -122,17 +126,6 @@ def userProfile():
             return redirect(url_for('ticket'))
         return render_template('profile.html', user=get_user(session['username']))
     return redirect(url_for('index'))
-
-# Retirer avant fin developpement
-@app.route('/testgetallusers')
-def testGetAllUsers():
-    users = get_all_users()
-    return render_template('testusers.html', users=users)
-
-# Retirer avant fin developpement
-@app.route('/testuser/<username>')
-def user(username=None):
-    return render_template('testuserdetails.html', username=username)
 
 # Autres
 
