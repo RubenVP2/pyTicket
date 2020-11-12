@@ -97,15 +97,9 @@ def ticketDelete(idTicket: str):
     """ Check if the current user is the creator of this ticket and Delete it on database"""
     """ check if the user is logged in """
     if 'username' in session :
-<<<<<<< HEAD
-        """ Check if idTicket can parse to int to catch error """
-        if isinstance(idTicket, int) and ticketIsAtUser(int(idTicket)):
-            delete_ticket(int(idTicket))
-=======
         """ check if the user is as user """
         if ticketIsAtUser(int(idTicket)):
             delete_ticket(idTicket)
->>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
             flash("Votre ticket à bien été supprimé", 'success')
             return redirect(url_for('ticket'))
         """ Return error msg """
@@ -149,11 +143,7 @@ def ticketIsAtUser(idTicket: int):
 
 # BDD
 
-<<<<<<< HEAD
 def make_query(query: str, needCommit: bool, isAll: bool=None):
-=======
-def make_query(query, needCommit, isAll=None):
->>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
     """ Make query and return in list all rows or just one """
     db = get_db()
     cur = db.cursor()
@@ -210,19 +200,6 @@ def get_all_tickets():
     """ Return all tickets in database """
     return make_query("SELECT ticket.id, user.username as 'username', sujet_ticket,date_ticket , strftime('%d/%m/%Y', date_ticket), etat_ticket FROM user inner join ticket on user.id = ticket.client_id ORDER BY datetime(date_ticket, 'unixepoch') DESC",0,1)
 
-<<<<<<< HEAD
-def login(username: str, password: str):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'")
-    return cur.fetchall()
-
-def get_user(username: str):
-    db = get_db()
-    cur = db.cursor()
-    cur.execute(f"SELECT * FROM user where username='{username}'")
-    return cur.fetchone()
-=======
 def login(username, password):
     """ Return username and isAdmin with params username and password"""
     return make_query(f"SELECT username, isAdmin FROM user where username='{username}' AND password ='{password}'",0,1)
@@ -230,7 +207,6 @@ def login(username, password):
 def get_user(username):
     """ Return all from username with params username"""
     return make_query(f"SELECT * FROM user where username='{username}'",0,0)
->>>>>>> b6ae787659771d8178f74ba65678aaa5819345e3
 
 def get_db():
     """ Get DB """
