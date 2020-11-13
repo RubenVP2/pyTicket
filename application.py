@@ -15,7 +15,7 @@ app.secret_key = b"\x98\xca\x17\xbfg/v\x1dB\x93Lu\xcf3\x93\xfa"
 @app.route("/", methods=["GET", "POST"])
 def index():
     """ Show the login form or log the user """
-    if usernameInSession:
+    if usernameInSession():
         return redirect(url_for("ticket"))
     # Test is request is POST
     if request.method == "POST":
@@ -46,7 +46,7 @@ def page_not_found(error):
 @app.route("/ticket")
 def ticket():
     """ Return list of tickets to suit of type user """
-    if usernameInSession:
+    if usernameInSession():
         user = get_user(session["username"])
         # check is the user is admin
         if user["isAdmin"]:
@@ -60,7 +60,7 @@ def ticket():
 @app.route("/add-ticket", methods=["GET", "POST"])
 def ajout_ticket_page():
     """ add ticket for user type=client"""
-    if usernameInSession:
+    if usernameInSession():
         user = get_user(session["username"])
         # check if the user isn't admin
         if user["isAdmin"] == 0:
@@ -81,7 +81,7 @@ def ajout_ticket_page():
 @app.route("/ticket/<int:idTicket>", methods=["GET", "POST"])
 def ticketDetail(idTicket: int):
     """ Return template to show detail of ticket if user is connected and if idTicket have no error """
-    if usernameInSession:
+    if usernameInSession():
         user = get_user(session["username"])
         # check if idTicket in url is lower or egal to max idTicket on bdd
         idTicketUrlValid = (
@@ -116,7 +116,7 @@ def ticketDetail(idTicket: int):
 @app.route("/ticket/<int:idTicket>/delete")
 def ticketDelete(idTicket):
     """ Delete idTicket on bdd and return user to /ticket """
-    if usernameInSession:
+    if usernameInSession():
         # Check if the current user is the creator of this ticket and Delete it on database
         if ticketIsAtUser(idTicket):
             delete_ticket(idTicket)
@@ -131,7 +131,7 @@ def ticketDelete(idTicket):
 @app.route("/profile", methods=["GET", "POST"])
 def userProfile():
     """ Return template for user profile and can update new values of username and password """
-    if usernameInSession:
+    if usernameInSession():
         # Check if method is post, then we need to update values on database
         if request.method == "POST":
             username = request.form["username"]
